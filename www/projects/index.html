@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Jack Kotheimer Projects</title>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans&display=swap"/>
+		<link rel="stylesheet" href="/site.css"/>
+	</head>
+	<body>
+		<div class="navbar">
+			<a href="/">
+				<img src="/images/home.png" class="nav_item" title="Home"/>
+			</a>	
+			<a href="/projects/">
+				<img src="/images/lightbulb.png" class="nav_item" title="Projects"/>
+			</a>
+			<a href="/work_experience/">
+				<img src="/images/suitcase.png" class="nav_item" title="Work Experience"/>
+			</a>
+			<a href="/hobbies/">
+				<img src="/images/puzzle_piece.png" class="nav_item" title="Hobbies"/>
+			</a>
+			<a href="/documents/">
+				<img src="/images/documents.png" class="nav_item" title="Documents"/>
+			</a>
+			<div class="nav_bottom">
+				<a href="https://github.com/jkotheimer/" target="_blank">
+					<img src="/images/github-logo.png" class="nav_item nav_link" title="My GitHub Page"/>
+				</a>
+				<a href="https://www.linkedin.com/in/jack-kotheimer/" target="_blank">
+					<img src="/images/linkedin-logo.png" class="nav_item nav_link" title="My LinkedIn Page"/>
+				</a>
+			</div>
+		</div>
+
+		<div class="panel_area panel_area_full hazy">
+			<a id="pianoboard" href="https://github.com/Jkotheimer/PianoBoard.git" target="_blank"
+				class="panel header" title="Go to GitHub">
+				Pianoboard
+				<div class="subtitle">Solo project</div>
+			</a>
+			<div class="panel panel_two_thirds">
+				<h1>
+					Description
+				</h1>
+				<p>
+					Pianoboard is a personal full stack web development project.
+					The front end is purely written in HTML5/CSS/JavaScript. The back end runs on an Apache web server
+					using a PHP/MySQL instance for all CRUD operations. The middleware REST API is implemented in
+					Java using Apache CXF running on a Tomcat servlet. This servlet runs on a separate port from the Apache
+					web server, and is therefore proxied to under the /api directory. The REST API is to be reimplemented in 
+					Node.js or some other runner up tool to simplify the codebase and compare performance. Java middleware
+					can often be over-engineered, so I'd like to see if using a different tool opens the possibility for a
+					more readable and maintainablle codebase.
+				</p>
+			</div>
+			<img src="/images/pianoboard_login.png" class="panel panel_third"/>
+			<img src="/images/pianoboard_ERD.png" class="panel panel_clear"/>
+			<div class="panel panel_three_quarters">
+				<h1>
+					ERD Explained
+				</h1>
+				<p>
+					Above is a nice little Entity Relationship Diagram of the Pianoboard SQL database. I tried to keep it as simple
+					as possible. User accounts are of course the focal point. Users have a list of favorite genres and favorite
+					artists (I may add more detailed preferences and 'likes' later). Each account is tied to a list of known IP
+					addresses and IP addresses that have tried and failed to login. This is obviously used for security in the middleware.
+					Accounts also have tokens tied to them, used for authentication. And lastly, each user account has a list of
+					zero or more projects. Each project has a list of tracks, upon which there is a list of recordings, within which
+					there is a list of notes. Each of those entities has an ID along with a creation datae and last modified date.
+					There is a separate table that lists the permissions any one account may have to an entity that does not belong
+					to them. For instance, if user 123 made a recording that they want to share with their friend, they could do so,
+					and their friend's account ID would show up in the AccessRights table along with the recording ID, giving them
+					read or write permissions.
+				</p>
+			</div>
+		</div>
+		<div class="panel_area panel_area_full hazy">
+			<a id="ecommerce" href="https://github.com/Jkotheimer/Web_Services_P2.git" target="_blank"
+				class="panel header" title="Go to GitHub">
+				E-commerce Website
+				<div class="subtitle">Group Project</div>
+			</a>
+			<div class="panel credits">
+				With 
+				<a href="https://github.com/jman11111/" target="_blank" style="color: blue;">
+					Jack Broncato 
+				</a>
+				and 
+				<a href="https://github.com/rayyanshaji/" target="_blank" style="color: blue;">
+					Mohammed Rayyan Shaji
+				</a>
+			</div>
+			<div class="panel panel_two_thirds">
+				<h1>
+					Description
+				</h1>
+				<p>
+					This project was a little lighter on the UI than Pianoboard. It was my first server-side development project,
+					so the focus was on server logic. Mohammed, Jack, and I built a simple E-commerce REST API service written in
+					Java, using Apache CXF running on a Tomcat servlet (déjà vu much?). For about a month in December 2019, we
+					deployed the .war file on AWS ECS along with the basic client files. It of course was not secure by any means 
+					(no ssl certificate and no actual payment methods), but it had the general gist of an E-commerce site.
+					You've got buyer accounts and seller accounts. Sellers post items, Buyers search for them and buy them
+					(metaphorically). 
+				</p>
+			</div>
+			<img src="/images/E-commerce_login.png" class="panel panel_third panel_clear" style="border-radius: 30px;"/>
+			<img src="/images/E-commerce_ERD.png" class="panel panel_third panel_clear" style="border-radius: 30px;"/>
+			<div class="panel panel_two_thirds">
+				<h1>
+					ERD Explained
+				</h1>
+				<p>
+					To the right is another Entity Relationship Diagram. This one outlines the general premise behind the E-commerse
+					website. This was never actually implemented into a SQL database, but the relationships held for the actual
+					data storage mechanism that was used. Embarrassing as it is to say, that storage mechanism happened to just
+					be POJOs stored in RAM. Oof, that one doesn't look good on us but hey, it was our first web service and the
+					point was to learn how REST API works. And we did! Anywhomst, The premise of the ERD is fairly straight forward.
+					As stated above, there are buyer accounts and seller accounts. Buyers can place orders. The OrderedItems
+					relationship links orders with multiple different products of a specified quantity. Products are posted by 
+					sellers. Both buyers and sellers have addresses and payment infos. Payment infos also have a billing address
+					ID attribute. Pretty basic, but it's what got me started on this path of being a full stack web dev!
+				</p>
+			</div>
+		</div>
+		<div class="panel_area panel_area_full hazy">
+			<a id="talkmotion" href="https://github.com/Jkotheimer/Gesture-Recognition-Android-App.git" target="_blank"
+				class="panel header" title="Go to GitHub">
+				TalkMotion
+				<div class="subtitle">Group Project</div>
+			</a>
+			<div class="panel credits">
+				With 
+				<a href="https://github.com/MartinZugs/" target="_blank" style="color: blue;">
+					Martin Zugschwert,
+				</a>
+				<a href="https://www.linkedin.com/in/briannachou/" target="_blank" style="color: blue;">
+					Brianna Chou,
+				</a>
+				and
+				<a href="https://www.linkedin.com/in/jacob-kowalski-a7b356189/" target="_blank" style="color: blue;">
+					Jacob Kowalski
+				</a>
+			</div>
+			<img src="/images/TalkMotion_poster.png" class="panel panel_clear"/>
+			<div class="panel panel_two_thirds">
+				<h1>
+					Description
+				</h1>
+				<p>
+					Above is the research result poster for TalkMotion. This was presented at Loyola University Chicago's
+					Summer 2019 research program banquet. This application was meant to be a proof of concept for a research
+					project originally contrived by
+					<a href="https://sites.google.com/view/biomed-ai/people/mark-v-albert/"
+						style="text-decoration:underline" target="_blank">
+					Dr. Mark Albert</a> after meeting 
+					<a href="http://blogs.luc.edu/ips/sec-chair-hannah-thompson/"
+						style="text-decoration:underline" target="_blank">
+					Hannah Thompson</a>, a rather splendid graduate student who suffers from cerebral palsy. He noticed how
+					difficult her DynaVox was to work with, and figured a gesture-based device would be easier for people with
+					similar conditions to communicate with. More information about that experience can be found under the
+					<a href="/work_experience/" style="text-decoration:underline">work_experience</a> tab.
+					The application we ended up designing utilized the accelerometer inside an Android device and had a 6 different
+					hand motions preset with the app. Each motion can be assigned to a word, and we used a text to speech API
+					to have the phone speak each command.
+				</p>
+			</div>
+			<img src="/images/TalkMotion_group.jpeg" class="panel panel_third panel_clear"/>
+		</div>
+		<div class="panel_area panel_area_full hazy">
+			<a id="puzzle_solver" href="https://github.com/Jkotheimer/Chromium_Titanium_Pigeon_Sticks.git" target="_blank"
+				class="panel header" title="Go to GitHub">
+				Word Puzzle Solver
+				<div class="subtitle">Group Project</div>
+			</a>
+			<div class="panel credits">
+				With 
+				<a href="https://github.com/acristerna/" target="_blank" style="color: blue;">
+					Anissa Cristerna,
+				</a>
+				<a href="https://github.com/H3MP3/" target="_blank" style="color: blue;">
+					Matthew Hempe,
+				</a>
+				and
+				<a href="https://github.com/mgonzalez28/" target="_blank" style="color: blue;">
+					Miguel Gonzalez
+				</a>
+			</div>
+			<div class="panel panel_two_thirds">
+				<h1>
+					Description
+				</h1>
+				<p>
+					Our challenge was to solve the puzzle to the left. But not just that specific puzzle. Any word logic puzzle.
+					The process had to be entirely automated, but we could format the input of the puzzle any way we wanted
+					without giving away any hints (basically make it such that we didn't have to worry about natural language processing).
+					Simple enough... json! We structured the input data in a json file such that the first entity is the list
+					of objects being referred to, the next three are the objects being solved for, and the rest are clues.
+					Here is an example of what the JSON file looked like for the Mixed up Purses problem:<br/>
+					{<br/>
+					&emsp;"people" : ["Paula", "Pat", "Pam", "Penny", "Peggy"],<br/>
+					&emsp;"lost" : ["lipstick", "comb", "compact", "file", "keyring"],<br/>
+					&emsp;"lastname" : ["Jones", "Smith", "Johnson", "Doe", "Dixon"],<br/>
+					&emsp;"job" : [ "doctor", "lawyer", "judge", "teacher", "pilot"],<br/>
+					&emsp;"clue1" : {"job" : "pilot", ... <br/>
+					}<br/>
+					There's not much front end to this project, but the highlights in my opinion are the data structures we created
+					to make the logic work as smoothly as it does, and the project management.
+				</p>
+			</div>
+			<img src="/images/Word_puzzle.png" class="panel panel_third panel clear"/>
+			<div class="panel panel_half">
+				<h1>
+					A Look at the Code
+				</h1>
+				<p>
+					There are only 4 main project files. One of which is the main function, the rest of which are custom data
+					structures to hold the arbitrary puzzle information. One is a reference map, one is a clue map, and the other
+					is a puzzle solver class to blend the two together. The clue map is essentially an iterator, and the reference map
+					is a hash map, but with an auto-eliminate method to read through itself and eliminate invalid attributes.
+					The main method grinds the two together with the puzzle solver class until the puzzle is solved. Unit tests
+					are of course implemented to cover almost every method in every class, and they all pass for several different
+					word logic puzzle inputs.
+				</p>
+			</div>
+			<div class="panel panel_half">
+				<h1>
+					Project Management
+				</h1>
+				<p>
+					This project was completed as a midterm for COMP 330 - Software Engineering. The premise of the class was not only
+					to create a working software system, but to manage a team properly. Our team ran like a hot knife through butter.
+					Not everybody was familiar with Git version controlling, so we all met up at the library together and gathered
+					around a laptop. I have rather quick hands, so I coded the ideas as they spilled out of my colleagues mouths.
+					It truly was a hell of a situation to be a part of. Very cliché college study session with the whiteboard full
+					of heiroglyphics and people pacing back and forth in a small conference room 90% of the project was done in a day.
+					After that, I assigned each person a task: Bug report, Requirements completion report, unit tests, and code cleansing/
+					documentation. Needless to say, we got a damn good grade.
+				</p>
+			</div>
+		</div>
+	</body>
+</html>
