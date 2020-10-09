@@ -37,7 +37,34 @@
 		<div class="panel_area panel_area_full hazy">
 			<div class="panel header">
 				My Work Experience
-				<div class="subtitle">The Full Story</div>
+			</div>
+			<div class="panel panel_two_thirds">
+				<h1>
+					Back-end Developer Intern
+				</h1>
+				<h2>
+					<a href='https://www.ezclinic.co/' target="_blank">EzClinic&trade;</a><br/>
+					09/2020 - current
+				</h2>
+				<ul>
+					<li>Reorganized source code repository and filtered out unnecessary and unsafe files</li>
+					<li>Wrote bash scripts to automate the 3 main deployment mechanisms:</li>
+					<ul>
+						<li>Local development &amp; debugging server deployment</li>
+						<li>Remote staging server deployment using ElasticBeanstalk &amp; test result fetching</li>
+						<li>Production server deployment using ElasticBeanstalk &amp; CNAME swap</li>
+					</ul>
+					<li>Executed the migration from a local database to a remote database with a secure transfer of credentials upon deployment</li>
+					<li>Completely decoupled server logic from client applications by refactoring to a REST api through the following means:</li>
+					<ul>
+						<li>Created a full documentation spreadsheet outlining the I/O and application flow of a REST api that would serve the same functionality as before</li>
+						<li>
+							Implemented the decoupling of each HTTP request one REST function at a time, working with the front-end intern to ensure the client application
+							accounted for each new api route with every update
+						</li>
+						<li>Utilized the previously written staging script to test each decoupled function before being pushed to production</li>
+					</ul>
+				</ul>
 			</div>
 			<div class="panel panel_two_thirds">
 				<h1>

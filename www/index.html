@@ -46,24 +46,27 @@
 					Who am I?
 				</h1>
 				<p>
-					I am an engineer located in Chicago, Illinois. I have a B.S. in software engineering,
-					and I am currently attending UIC for a M.S in electrical engineering. I decided to
-					make this site and host it from a Raspberry Pi in my apartment as a fun little project
-					to keep me occupied while my classes obliterated my sanity! Since then, I've migrated
-					the site to Amazon Web Services.
+					I am an engineer located in Chicago, Illinois and I'm <span id='jacks_age'></span> years old. 
+					You could describe me as a punk-nerd. I have a B.S. in software engineering and I'm in love
+					with all things STEM, but you'll find me playing drums along to Blink-182 songs and skateboarding
+					around the suburbs on my free time.
 				</p>
 			</div>
+			<script>
+				// current unix timestamp minus my birth minute unix timestamp, converted to years and rounded down
+				var jacks_age = parseInt((Date.now() - 915463800000)/31540000000);
+				document.getElementById('jacks_age').innerHTML = jacks_age;
+			</script>
 			<div class="panel">
 				<h1>
-					Where am I now?
+					What am I up to now?
 				</h1>
 				<p>
-					Well, I'm most likely at a desk, teaching myself some random skill out of absolute boredome.
-					In a more worldly sense, I am trying to put myself through graduate school, which means ya boy
-					needs some experience. I'm ready for any part-time opportunities as a sofware developer (which
-					is where my strengths lie currently). I'll make you the niftiest server-side solutions south of Santa.
-					That may be an overstatement, but my proudest skills are: happily hacking away at problems 'till they're solved,
-					caring too much, and snacking perpetually.
+					I am currently a back-end developer intern at <a href='https://www.ezclinic.co/' target='_blank'>EzClinic&trade;</a>.
+					They've been having me do all sorts of fun stuff over there. Most notably, writing deployment automation scripts,
+					restructuring the tech stack of their web server and database, and refactoring their web app down to a REST api
+					to decouple the server-side code from the client. +10 points for you if you understood any of that! Along with that,
+					I have been pursuing hobbies and other career goals in my free time.
 				</p>
 			</div>
 		</div>
@@ -74,10 +77,9 @@
 					Where do I want to be?
 				</h1>
 				<p>
-					This question is rigged because the answer changes every month. Right now, I want to be and embedded systems engineer, 
-					mixing that software and hardware knowledge. That's the dream, ya know? Like after this graduate degree and several internships.
-					The focus of my undergrad was backend web service programming. Like designing and writing REST api's and SaaS/PaaS systems. I'll use that to
-					keep myself employed through grad school until I'm qualified for a position as an electrical engineer.
+					The long term goal is to become an embedded systems engineer. I love audio and signal processing systems, so I'd love to
+					develop embedded devices that deal with such things. This obviously means I need a degree in E.E., which I
+					will feel comfortable pursuing when universities are safe to return to in-person classes. 
 				</p>
 			</div>
 		</div>
