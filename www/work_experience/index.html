@@ -47,12 +47,17 @@
 					09/2020 - current
 				</h2>
 				<ul>
-					<li>Reorganized source code repository and filtered out unnecessary and unsafe files</li>
-					<li>Wrote bash scripts to automate the 3 main deployment mechanisms:</li>
+					<li>Reorganized source code repository and filtered out unnecessary and unsafe file and wrote bash scripts to automate the 3 main deployment mechanisms:</li>
 					<ul>
 						<li>Local development &amp; debugging server deployment</li>
 						<li>Remote staging server deployment using ElasticBeanstalk &amp; test result fetching</li>
 						<li>Production server deployment using ElasticBeanstalk &amp; CNAME swap</li>
+					</ul>
+					<li>The script builds a Docker image for each of the above servers from a templated Dockerfile, which is pushed to Dockerhub for ease of use and version control</li>
+					<ul>
+						<li>Built a celery notification system running on a RabbitMQ server into each Docker image</li>
+						<li>Configured MySQL, RabbitMQ, and Nginx servers and on each Docker image</li>
+						<li>Wrote several deployment hooks to run the Django wsgi on Nginx, connect it to the MySQL server, &amp; connect a Celery notifier to the RabbitMQ server</li>
 					</ul>
 					<li>Executed the migration from a local database to a remote database with a secure transfer of credentials upon deployment</li>
 					<li>Completely decoupled server logic from client applications by refactoring to a REST api written in Python, using the Django framework</li>
