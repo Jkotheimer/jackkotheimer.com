@@ -1,0 +1,6 @@
+version: "3"
+task_definition:
+  services:
+    web:
+      cpu_shares: 1020
+      mem_limit: 1950

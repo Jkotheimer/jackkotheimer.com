@@ -1,0 +1,20 @@
+version: '3'
+services:
+  web:
+    image: $DHOST/$ORG/${APP}_$ENV:$TAG
+    container_name: $APP
+    hostname: $ORG-$APP
+    volumes:
+      - ./:/srv
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - ENV=$ENV
+    command: /run.sh
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: $AWS_DEFAULT_REGION
+        awslogs-group: $APP-$ENV-logs
+        awslogs-stream-prefix: $ORG
