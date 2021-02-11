@@ -256,6 +256,10 @@ kill_server() {
 		read -r -n 1 -p "Would you like to kill the $ENV server? [y/N]: " CHOICE
 		echo
 		[ "${CHOICE^^}" = Y ] || return 1
+		read -r -n 1 -p "Are you 100% positive? This is the $ENV server we're talking about!" CHOICE
+		echo
+		[ "${CHOICE^^}" = Y ] || return 1
+
 		_print "killing $ENV server"
 		_handle "ecs_shortcut down --force"
 	fi
@@ -331,7 +335,7 @@ enter_docker_shell() {
 	if [ "$ENV" = dev ]; then
 		docker exec -it "$APP" bash
 	else
-		check_remote_conf
+		remote_conf_check
 		_warn 'Use "docker exec -it $(docker ps -qf name=web) bash" to enter docker container within ec2 instance' 
 		ssh -i ~/.ssh/$KEYPAIR ec2-user@$AWS_DNS
 	fi
@@ -346,22 +350,35 @@ get_logs() {
 }
 # When switching between machines or developers, use this command to allow ssh access with your keypair
 rebuild_ecs_cluster() {
+	remote_conf_check
+
+	_warn "In order to rebuild the ecs cluster, you need to specify your networking options. All of these options may be found in the AWS console."
+	read -r -p "Security group ID: " SECURITY_GROUP
+	read -r -p "VPC ID: " VPC
+	read -r -p "Subnet IDs (1 or more, comma+nospace separated): " SUBNETS
+	read -r -p "Number of servers [1]: " SIZE
+	SIZE=${SIZE:-1}
+	read -r -p "Instance type [t2.medium]: " TYPE
+	TYPE=${TYPE:-t2.medium}
+	echo "Size $SIZE"
+	echo "Type $TYPE"
+
 	# https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cmd-ecs-cli-up.html
 	_print "Generating $ENV ECS cluster..."
 	_handle "ecs-cli up --cluster-config $APP-$ENV \
 			--ecs-profile $ORG-remote \
 			--keypair "$KEYPAIR" \
 			--capability-iam \
-			--size 1 \
-			--instance-type t2.medium \
-			--security-group sg-0f79330791670cf6e \
-			--vpc vpc-eeb9ee94 \
-			--subnets subnet-8fb64a81,subnet-6b070037,subnet-e80706c6,subnet-5cad6711,subnet-6bc6fd0c,subnet-6559175b \
+			--size $SIZE \
+			--instance-type $TYPE \
+			--security-group $SECURITY_GROUP \
+			--vpc $VPC \
+			--subnets $SUBNETS \
 			--force
 			--verbose" ecs-up.log
 }
 add_ssh_key() {
-	check_remote_conf
+	remote_conf_check
 
 	read -r -s -p "Authority, enter your passcode: " PASSCODE
 	echo
@@ -451,7 +468,8 @@ get_aws_dns() {
 			| grep PublicDnsName \
 			| head -1 \
 			| sed 's/.*: "//g; s/".*//g')"
-	[ $? -eq 0 ] && _ok || _err "$AWS_DNS"
+	[ -z "$AWS_DNS" ] && _err "Couldn't retrieve your servers dns hostname. Perhaps you need to create a cluster (./run.sh -R)" -
+	_ok
 	update_conf AWS_DNS "$AWS_DNS"
 	update_conf ALLOWED_HOSTS "$AWS_DNS" "deployment/$ENV/web.env"
 }
@@ -478,7 +496,15 @@ _verbose() {
 # -----------------------------------------------------------------------------
 ###############################################################################
 
-check_remote_conf() {
+# Check for missing required software
+check_conf() {
+	ERR=()
+	for cmd in "$@"; do
+		command -v "$cmd" &>/dev/null || ERR+=("$cmd")
+	done
+	[ ${#ERR[@]} -gt 0 ] && _err "You must install the following package(s) in order to deploy this project: ${ERR[*]}" -
+}
+remote_conf_check() {
 	[ -z "$AWS_DEFAULT_REGION" ] && prompt_conf 'AWS default region [default=us-east-1]: ' AWS_DEFAULT_REGION us-east-1
 	[ -z "$KEYPAIR" ] && prompt_conf 'AWS keypair name: ' KEYPAIR
 	[[ -z "$AWS_ACCESS_KEY_ID" || -z "$AWS_SECRET_ACCESS_KEY" ]] && get_aws_cred
@@ -499,18 +525,15 @@ check_remote_conf() {
 	_print "Applying ecs profile"
 	_handle "ecs-cli configure profile --profile-name $ORG-remote"
 
-	[ -z "$AWS_DNS" ] && get_aws_dns
 	
-	req_check ecs-cli aws
+	check_conf ecs-cli aws
 }
-
-# Check for missing required software
-req_check() {
-	ERR=()
-	for cmd in "$@"; do
-		command -v "$cmd" &>/dev/null || ERR+=("$cmd")
-	done
-	[ ${#ERR[@]} -gt 0 ] && _err "You must install the following package(s) in order to deploy this project: ${ERR[*]}" -
+check_production_conf() {
+	[ ! -f deployment/production/ssl/jackkotheimer.key || ! -f deployment/production/ssl/jackkotheimer.bundle ] && 
+		_err "Please put your ssl certificates under deployment/production/ssl/"
+	
+	# Generate the dhparams if they aren't already in there
+	[ ! -f deployment/production/ssl/dhparams.pem ] && openssl dhparam -out deployment/production/ssl/dhparams.pem 4096
 }
 
 if [ $EUID -eq 0 ]; then
@@ -520,7 +543,7 @@ if [ $EUID -eq 0 ]; then
 	[[ ${CHOICE^^} != 'Y' ]] && exit 1
 fi
 mkdir -p logs/
-req_check docker docker-compose
+check_conf docker docker-compose
 
 # Check for valid .config, then export all it's variables
 if ! grep APP .config &>/dev/null; then
@@ -549,10 +572,12 @@ _deploy() {
 		_print "Deploying dev server"
 		_handle "docker-compose up" docker-compose.log /
 	else
-		check_remote_conf
+		remote_conf_check
 
-		echoc "Copying $(pwd) to $AWS_DNS:/app" "$yellow"
-		scp -r -i ~/.ssh/$KEYPAIR $(pwd)/* ec2-user@$AWS_DNS:/app
+		[ -z "$AWS_DNS" ] && get_aws_dns
+		echoc "Copying $(pwd) to $AWS_DNS:/srv" "$yellow"
+		scp -r -i ~/.ssh/$KEYPAIR $(pwd)/* ec2-user@$AWS_DNS:/srv
+		[ $? -ne 0 ] && _err "Couldn't connect" -
 
 		# https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cmd-ecs-cli-compose-service-up.html
 		_print "Composing $APP to $ENV with ECS"
@@ -561,8 +586,8 @@ _deploy() {
 				service up \
 				--cluster-config $APP-$ENV \
 				--ecs-profile $ORG-remote \
-				--force-deployment" ecs-compose.log
-				#--create-log-groups <- Add this back in if you can't access the logs
+				--force-deployment \
+				--create-log-groups" ecs-compose.log #<- Add this back in if you can't access the logs
 	fi
 }
 
