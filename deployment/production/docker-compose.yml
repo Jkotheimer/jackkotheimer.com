@@ -2,13 +2,12 @@ version: '3'
 services:
   web:
     image: $DHOST/$ORG/${APP}_$ENV:$TAG
-    container_name: $APP
     hostname: $ORG-$APP
     volumes:
       - /srv:/srv
     ports:
       - 443:443
-    command: /run.sh
+    command: /srv/deployment/run.sh
     logging:
       driver: awslogs
       options:
