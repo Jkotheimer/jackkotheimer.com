@@ -162,7 +162,8 @@ _help() {
 	[ -z "${DHOSTS[$ENV]}" ] && NCOLOR="$red"
 	echoc "        Docker image host for $ENV currently set to '${DHOSTS[$ENV]}'" "$NCOLOR"
 	echoc 'Remote specific commands' "$yellow"
-	echo '--rebuild      [-R]: Rebuild ecs cluster (when switching between machines to use new ssh keypair)'
+	echo '--build-cluster[-B]: Rebuild ecs cluster (when switching between machines to use new ssh keypair)'
+	echo '--delete-cluster   : Delete the ecs cluster'
 	echo "--aws-dns      [-D]: Fetch the most recent dns hostname for the $ENV server"
 	NCOLOR="$green"
 	[ -z "$AWS_DNS" ] && NCOLOR="$red"
@@ -216,24 +217,19 @@ create_docker_container() {
 	kill_server -
 	_print "Creating Docker container named $APP with image: $ORG/${APP}_$ENV:$TAG"
 	_handle "docker run -d --rm \
-			--env-file $(pwd)/deployment/$ENV/web.secret \
-			--env-file $(pwd)/deployment/$ENV/web.env \
-			--env-file $(pwd)/deployment/$ENV/db.secret \
-			--env-file $(pwd)/deployment/$ENV/db.env \
-			--env-file $(pwd)/deployment/$ENV/rabbitmq.secret \
-			--env-file $(pwd)/deployment/$ENV/rabbitmq.env \
 			--hostname com-$APP-app \
+			-e ENV=$ENV \
 			--name $APP \
-			-v $(pwd):/app \
+			-v $(pwd):/srv \
 			-p 80:80 \
 			-it $ORG/${APP}_$ENV:$TAG $1" docker-run.log
 }
 kill_server() {
-	if [[ "$ENV" = dev || $1 -eq 1 ]]; then
+	if [[ "$ENV" = dev || -n "$1" ]]; then
 		_print "Killing local dev server"
 		# not in a _handle because it doesn't matter if these fail
-		docker kill "$APP" db rabbitmq &>/dev/null
-		docker rm "$APP" db rabbitmq &>/dev/null
+		docker kill "$APP" db &>/dev/null
+		docker rm "$APP" db &>/dev/null
 		_ok
 	else
 		read -r -n 1 -p "Are you sure you wish to stop the $APP $ENV task? [y/N]: " CHOICE
@@ -242,7 +238,7 @@ kill_server() {
 		_print "Stopping task"
 		_handle "ecs_shortcut compose \
 			--project-name $APP \
-			service stop \
+			service down \
 			--cluster-config $APP-$ENV \
 			--ecs-profile $ORG-remote"
 		_print "Removing service"
@@ -252,17 +248,14 @@ kill_server() {
 			--cluster-config $APP-$ENV \
 			--ecs-profile $ORG-remote"
 		sleep 10
-
-		read -r -n 1 -p "Would you like to kill the $ENV server? [y/N]: " CHOICE
-		echo
-		[ "${CHOICE^^}" = Y ] || return 1
-		read -r -n 1 -p "Are you 100% positive? This is the $ENV server we're talking about!" CHOICE
-		echo
-		[ "${CHOICE^^}" = Y ] || return 1
-
-		_print "killing $ENV server"
-		_handle "ecs_shortcut down --force"
 	fi
+}
+delete_cluster() {
+	_print "Deleting ecs cluster (this may take some time)"
+	_handle "ecs_shortcut down \
+		--cluster-config $APP-$ENV \
+		--ecs-profile $ORG-remote \
+		--force"
 }
 # Log in to an image host, dependant on current environment
 docker_login() {
@@ -335,7 +328,7 @@ enter_docker_shell() {
 	if [ "$ENV" = dev ]; then
 		docker exec -it "$APP" bash
 	else
-		remote_conf_check
+		[ -z "$AWS_DNS" ] && get_aws_dns
 		_warn 'Use "docker exec -it $(docker ps -qf name=web) bash" to enter docker container within ec2 instance' 
 		ssh -i ~/.ssh/$KEYPAIR ec2-user@$AWS_DNS
 	fi
@@ -349,8 +342,7 @@ get_logs() {
 	fi
 }
 # When switching between machines or developers, use this command to allow ssh access with your keypair
-rebuild_ecs_cluster() {
-	remote_conf_check
+build_ecs_cluster() {
 
 	_warn "In order to rebuild the ecs cluster, you need to specify your networking options. All of these options may be found in the AWS console."
 	read -r -p "Security group ID: " SECURITY_GROUP
@@ -364,7 +356,7 @@ rebuild_ecs_cluster() {
 	echo "Type $TYPE"
 
 	# https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cmd-ecs-cli-up.html
-	_print "Generating $ENV ECS cluster..."
+	_print "Generating $ENV ECS cluster"
 	_handle "ecs-cli up --cluster-config $APP-$ENV \
 			--ecs-profile $ORG-remote \
 			--keypair "$KEYPAIR" \
@@ -378,7 +370,8 @@ rebuild_ecs_cluster() {
 			--verbose" ecs-up.log
 }
 add_ssh_key() {
-	remote_conf_check
+
+	[ -z "$AWS_DNS" ] && get_aws_dns
 
 	read -r -s -p "Authority, enter your passcode: " PASSCODE
 	echo
@@ -471,7 +464,6 @@ get_aws_dns() {
 	[ -z "$AWS_DNS" ] && _err "Couldn't retrieve your servers dns hostname. Perhaps you need to create a cluster (./run.sh -R)" -
 	_ok
 	update_conf AWS_DNS "$AWS_DNS"
-	update_conf ALLOWED_HOSTS "$AWS_DNS" "deployment/$ENV/web.env"
 }
 get_aws_task_id() {
 	_print "Retrieving latest ECS task id"
@@ -497,7 +489,7 @@ _verbose() {
 ###############################################################################
 
 # Check for missing required software
-check_conf() {
+conf_check() {
 	ERR=()
 	for cmd in "$@"; do
 		command -v "$cmd" &>/dev/null || ERR+=("$cmd")
@@ -520,48 +512,26 @@ remote_conf_check() {
 			--default-launch-type EC2 \
 			--config-name $APP-$ENV \
 			--region $AWS_DEFAULT_REGION"
-	
+
 	# https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cmd-ecs-cli-configure-profile.html
 	_print "Applying ecs profile"
 	_handle "ecs-cli configure profile --profile-name $ORG-remote"
 
-	
-	check_conf ecs-cli aws
+	conf_check ecs-cli aws
 }
-check_production_conf() {
-	[ ! -f deployment/production/ssl/jackkotheimer.key || ! -f deployment/production/ssl/jackkotheimer.bundle ] && 
+production_conf_check() {
+	[[ ! -f deployment/production/ssl/jackkotheimer.key || ! -f deployment/production/ssl/jackkotheimer.bundle ]] && 
 		_err "Please put your ssl certificates under deployment/production/ssl/"
 	
 	# Generate the dhparams if they aren't already in there
 	[ ! -f deployment/production/ssl/dhparams.pem ] && openssl dhparam -out deployment/production/ssl/dhparams.pem 4096
 }
 
-if [ $EUID -eq 0 ]; then
-	_warn 'Hold your horses! You are running this script as root, meaning other users will not be able to access many of the generated server resources.'
-	read -r -n 1 -p 'Are you sure you wish to continue? [y/N] ' CHOICE
-	echo
-	[[ ${CHOICE^^} != 'Y' ]] && exit 1
-fi
-mkdir -p logs/
-check_conf docker docker-compose
-
-# Check for valid .config, then export all it's variables
-if ! grep APP .config &>/dev/null; then
-	_warn 'Invalid .config'
-	read -r -n 1 -p 'Regenerate? [Y/n]: ' CHOICE
-	echo
-	[[ ${CHOICE^^} != 'Y' ]] && exit 1
-	gen_app_conf
-fi
-source .config
-efile .config
-
 ###############################################################################
 # -----------------------------------------------------------------------------
 # DEPLOYMENT MECHANISM
 # -----------------------------------------------------------------------------
 ###############################################################################
-
 _deploy() {
 	
 	export COMPOSE_FILE="./deployment/$ENV/docker-compose.yml"
@@ -572,12 +542,11 @@ _deploy() {
 		_print "Deploying dev server"
 		_handle "docker-compose up" docker-compose.log /
 	else
-		remote_conf_check
 
 		[ -z "$AWS_DNS" ] && get_aws_dns
 		echoc "Copying $(pwd) to $AWS_DNS:/srv" "$yellow"
-		scp -r -i ~/.ssh/$KEYPAIR $(pwd)/* ec2-user@$AWS_DNS:/srv
-		[ $? -ne 0 ] && _err "Couldn't connect" -
+		#scp -r -i ~/.ssh/$KEYPAIR $(pwd)/* ec2-user@$AWS_DNS:/srv
+		[ $? -ne 0 ] && _err "Couldn't connect. Make sure you've built a cluster and given user 1000 permissions to the /srv directory (./run.sh -l; sudo chown -R 1000:1000 /srv)" -
 
 		# https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cmd-ecs-cli-compose-service-up.html
 		_print "Composing $APP to $ENV with ECS"
@@ -586,8 +555,8 @@ _deploy() {
 				service up \
 				--cluster-config $APP-$ENV \
 				--ecs-profile $ORG-remote \
-				--force-deployment \
-				--create-log-groups" ecs-compose.log #<- Add this back in if you can't access the logs
+				--force-deployment"
+				#--create-log-groups" ecs-compose.log #<- Add this back in if you can't access the logs
 	fi
 }
 
@@ -637,23 +606,6 @@ parse_cmd() {
 		--build | -b)
 			echo create_docker_image
 			return 0;;
-		# Remote specific
-		--rebuild | -R)
-			[ "$ENV" = dev ] && _err "Operation not allowed in current environment: $ENV"
-			echo rebuild_ecs_cluster
-			return 0;;
-		--aws-task-id | -I)
-			echo get_aws_task_id
-			return 0;;
-		--aws-dns | -D)
-			echo get_aws_dns
-			return 0;;
-		--aws-cred | -A)
-			echo get_aws_cred
-			return 0;;
-		--add-ssh-key | -S)
-			echo add_ssh_key
-			return 0;;
 		# State changers
 		--tag | -t)
 			echo update_conf TAG
@@ -691,6 +643,27 @@ parse_cmd() {
 		--logs | -L)
 			echo get_logs
 			return 4;;
+		# Remote specific
+		--build-cluster | -B)
+			[ "$ENV" = dev ] && _err "Operation not allowed in current environment: $ENV"
+			echo build_ecs_cluster
+			return 0;;
+		--delete-cluster)
+			[ "$ENV" = dev ] && _err "Operation not allowed in current environment: $ENV"
+			echo delete_cluster
+			return 0;;
+		--aws-task-id | -I)
+			echo get_aws_task_id
+			return 0;;
+		--aws-dns | -D)
+			echo get_aws_dns
+			return 0;;
+		--aws-cred | -A)
+			echo get_aws_cred
+			return 0;;
+		--add-ssh-key | -S)
+			echo add_ssh_key
+			return 0;;
 		
 		#########
 		# Error #
@@ -699,6 +672,30 @@ parse_cmd() {
 			return 255;;
 	esac
 }
+
+if [ $EUID -eq 0 ]; then
+	_warn 'Hold your horses! You are running this script as root, meaning other users will not be able to access many of the generated server resources.'
+	read -r -n 1 -p 'Are you sure you wish to continue? [y/N] ' CHOICE
+	echo
+	[[ ${CHOICE^^} != 'Y' ]] && exit 1
+fi
+mkdir -p logs/
+
+# Check for valid .config, then export all it's variables
+if ! grep APP .config &>/dev/null; then
+	_warn 'Invalid .config'
+	read -r -n 1 -p 'Regenerate? [Y/n]: ' CHOICE
+	echo
+	[[ ${CHOICE^^} != 'Y' ]] && exit 1
+	gen_app_conf
+fi
+source .config
+efile .config
+
+# Check the proper config for the given environment
+conf_check docker docker-compose
+[ "$ENV" != dev ] && remote_conf_check
+[ "$ENV" = production ] && production_conf_check
 
 # The pre- and post-primary commands are placed in separate arrays to be executed at their respective times
 PRE=()
