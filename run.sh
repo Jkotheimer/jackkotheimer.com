@@ -545,7 +545,7 @@ _deploy() {
 
 		[ -z "$AWS_DNS" ] && get_aws_dns
 		echoc "Copying $(pwd) to $AWS_DNS:/srv" "$yellow"
-		#scp -r -i ~/.ssh/$KEYPAIR $(pwd)/* ec2-user@$AWS_DNS:/srv
+		scp -r -i ~/.ssh/$KEYPAIR $(pwd)/* ec2-user@$AWS_DNS:/srv
 		[ $? -ne 0 ] && _err "Couldn't connect. Make sure you've built a cluster and given user 1000 permissions to the /srv directory (./run.sh -l; sudo chown -R 1000:1000 /srv)" -
 
 		# https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cmd-ecs-cli-compose-service-up.html

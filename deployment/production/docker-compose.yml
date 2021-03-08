@@ -3,6 +3,8 @@ services:
   web:
     image: $DHOST/$ORG/${APP}_$ENV:$TAG
     hostname: $ORG-$APP
+    env_file:
+      - web.env
     volumes:
       - /srv:/srv
     ports:

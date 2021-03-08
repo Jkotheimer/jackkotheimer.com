@@ -8,9 +8,8 @@ services:
       - ./:/srv
     ports:
       - 80:80
-      - 443:443
-    environment:
-      - ENV=$ENV
+    env_file:
+      - web.env
     command: ["/run.sh", "-g", "daemon off;"]
 #    logging:
 #      driver: awslogs
