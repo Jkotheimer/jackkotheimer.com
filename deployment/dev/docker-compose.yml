@@ -5,15 +5,9 @@ services:
     container_name: $APP
     hostname: $ORG-$APP
     volumes:
-      - ./:/srv
+      - ../../:/srv
     ports:
       - 80:80
     env_file:
       - web.env
-    command: ["/run.sh", "-g", "daemon off;"]
-#    logging:
-#      driver: awslogs
-#      options:
-#        awslogs-region: $AWS_DEFAULT_REGION
-#        awslogs-group: $APP-$ENV-logs
-#        awslogs-stream-prefix: $ORG
+    command: /srv/deployment/run.sh

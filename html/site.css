@@ -19,14 +19,12 @@ body {
 	padding-left: var(--nav-bar-width);
 	margin: 0px;
 	transform: none;
+	overflow-x: hidden;
 }
 :root {
 	--nav-bar-width: 50px;
-}
-a {
-	text-decoration: none;
-	outline: none;
-	color: lightblue;
+	--dark-grey: #333333;
+	--light-grey: #404040;
 }
 
 /*NAVBAR STYLES*/
@@ -37,7 +35,7 @@ a {
 	top: 0;
 	height: 100vh;
 	width: var(--nav-bar-width);
-	background-color: #333333;
+	background-color: var(--dark-grey);
 	z-index: 1;
 	transition: .2s ease;
 }
@@ -68,9 +66,48 @@ a {
 	bottom: 10px;
 }
 
-/* OPEN NAVBAR ITEMS */
-
 /* BODY PANEL STYLES */
+h1 {
+	font-family: 'Noto Sans', sans-serif;
+	font-size: 28px;
+}
+h2 {
+	text-align: center;
+	font-family: 'Noto Sans', sans-serif;
+	color: #999;
+	font-size: 20px;
+}
+p, ul {
+	text-align: left;
+	padding: 0px 10px 15px 40px;
+	font-family: 'Noto Sans', sans-serif;
+	font-size: 18px;
+}
+p {
+	background-color: 
+}
+ul {
+	width: max-content;
+}
+audio {
+	width: 100%;
+	background-color: transparent;
+}
+iframe {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	width: calc(100% - var(--nav-bar-width));
+	height: 100%;
+	z-index: -1;
+	background: transparent;
+}
+a {
+	text-decoration: none;
+	outline: none;
+	color: lightblue;
+}
+
 .panel_area {
 	position: relative;
 	vertical-align: top;
@@ -91,41 +128,9 @@ a {
 	border-radius: 25px;
 	border: 2px solid #333;
 }
-h1 {
-	font-family: 'Noto Sans', sans-serif;
-	font-size: 28px;
-}
-h2 {
-	text-align: center;
-	font-family: 'Noto Sans', sans-serif;
-	color: #999;
-	font-size: 20px;
-}
-p, ul {
-	text-align: left;
-	padding: 0px 50px 15px;
-	font-family: 'Noto Sans', sans-serif;
-	font-size: 18px;
-}
-ul {
-	padding-bottom: 0px;
-}
-audio {
-	width: 100%;
-	background-color: transparent;
-}
-iframe {
-	position: absolute;
-	right: 0px;
-	top: 0px;
-	width: calc(100% - var(--nav-bar-width));
-	height: 100%;
-	z-index: -1;
-	background: transparent;
-}
 .panel {
 	position: relative;
-	background-color: #333333;
+	background-color: var(--dark-grey);
 	border-radius: 5px;
 	color: #DDD;
 	text-align: center;
@@ -161,7 +166,7 @@ iframe {
 	text-align: center;
 	margin-bottom: 50px;
 	background-color: transparent;
-	color: #333333;
+	color: var(--dark-grey);
 	font-family: 'Noto Sans', sans-serif;
 	font-size: 4vw;
 	border: none;
@@ -209,7 +214,10 @@ iframe {
 	border-radius: 5px;
 	display: none;
 }
-
+.text_container {
+	overflow-x: auto;
+	background-color: var(--light-grey);
+}
 @media only screen and (max-width: 1480px) {
 	.panel_area_half{
 		width: 90%;
@@ -222,16 +230,16 @@ iframe {
 		width: 90%;
 	}
 	.panel.header {
-		font-size: 5vw;
+		font-size: 56px;
 	}
 	.subtitle {
-		font-size: 3vw;
+		font-size: 32px;
 	}
 	.panel.credits {
-		font-size: 2vw;
+		font-size: 28px;
 	}
 }
-@media only screen and (max-width: 850px) {
+@media only screen and (max-width: 1000px) {
 	.panel_half, .panel_two_thirds, .panel_three_quarters {
 		width: 95%;
 	}
@@ -239,7 +247,7 @@ iframe {
 		padding-left: 10px;
 		padding-right: 10px;
 	}
-	p, ul {
+	ul {
 		font-size: 14px;
 	}
 	p {
@@ -247,19 +255,45 @@ iframe {
 		padding-right: 20px;
 	}
 	.panel.header {
-		font-size: 7vw;
+		font-size: 36px;
 	}
 	.subtitle {
-		font-size: 4vw;
+		font-size: 24px;
 	}
 	.panel.credits {
-		font-size: 3vw;
+		font-size: 18px;
+	}
+
+	/* This is where the navbar jumps to the top of the page */
+	body {
+		width: 100vw;
+		padding-left: 0;
+		padding-top: var(--nav-bar-width);
+	}
+	.navbar {
+		height: var(--nav-bar-width);
+		width: 100vw;
+		text-align: left;
+	}
+	.nav_item {
+		position: relative;
+		padding: 5px;
+		margin: 5px;
+	}
+	.nav_link {
+		margin-top: 0px;
+		margin-left: 10px;
+	}
+	.nav_link:hover {
+		background-color: transparent;
+	}
+	.nav_bottom {
+		position: absolute; 
+		bottom: 0px;
+		right: 10px;
 	}
 }
 @media only screen and (max-width: 725px) {
-	body {
-		overflow-x: scroll;
-	}
 	:root {
 		--nav-bar-width: 40px;
 	}
@@ -267,13 +301,23 @@ iframe {
 		font-size: 5vw;
 	}
 	h2 {
-		font-size: 3.5vw;
+		font-size: 3vw;
 	}
-	p, ul {
-		font-size: 12px;
+	p {
+		font-size: 16px;
+		width: 700px;
 	}
 	.panel_third {
 		width: 95%;
+	}
+	.panel.header {
+		font-size: 24px;
+	}
+	.subtitle {
+		font-size: 18px;
+	}
+	.panel.credits {
+		font-size: 14px;
 	}
 }
 @media only screen and (max-height: 450px) {

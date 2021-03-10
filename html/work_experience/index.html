@@ -38,40 +38,76 @@
 			<div class="panel header">
 				My Work Experience
 			</div>
-			<div class="panel panel_two_thirds">
+			<div class="panel">
+				<h1>
+					Full-Stack Developer
+				</h1>
+				<h2>
+					<a href='https://www.ezclinic.co/' target="_blank">EzClinic&trade;</a><br/>
+					01/2021 - current
+				</h2>
+				<div class="text_container">
+					<ul>
+						<li>Wrote documentation outlining the REST API specification for new server logic that would maintain prior functionality</li>
+						<li>Completely decoupled server logic from client applications by refactoring to a REST API written with Django Python</li>
+						<ul>
+							<li>Implemented the decoupling of each HTTP route, one REST function at a time, for both the front and back ends of the application</li>
+						</ul>
+						<li>Utilized previously written script to deploy each update on a staging server to be tested by QA before being pushed to production</li>
+						<li>Currently: Researching multidimensional neural networks to begin work on a medical diagnostic machine learning algorithm</li>
+					</ul>
+				</div>
+			</div>
+			<div class="panel">
+				<h1>Data Entry Specialist</h1>
+				<h2>
+					<a href='https://www.jpmorganchase.com/' target="_blank">JPMorgan Chase &amp; Co.</a><br/>
+					01/2021 - current
+				</h2>
+				<div class="text_container">
+					<ul>
+						<li>Keyed values from scanned documents</li>
+						<li>Productivity metric: 95% - 105% (roughly 65 wpm)</li>
+					</ul>
+				</div>
+			</div>
+			<div class="panel">
 				<h1>
 					Back-end Developer Intern
 				</h1>
 				<h2>
 					<a href='https://www.ezclinic.co/' target="_blank">EzClinic&trade;</a><br/>
-					09/2020 - current
+					09/2020 - 01/2021
 				</h2>
-				<ul>
-					<li>Reorganized source code repository and filtered out unnecessary and unsafe file and wrote bash scripts to automate the 3 main deployment mechanisms:</li>
+				<div class="text_container">
 					<ul>
-						<li>Local development &amp; debugging server deployment</li>
-						<li>Remote staging server deployment using ElasticBeanstalk &amp; test result fetching</li>
-						<li>Production server deployment using ElasticBeanstalk &amp; CNAME swap</li>
+						<li>Reorganized source code repository and filtered out unnecessary and unsafe file and wrote bash scripts to automate the 3 main deployment mechanisms:</li>
+						<ul>
+							<li>Local development &amp; debugging server deployment</li>
+							<li>Remote staging server deployment using ElasticBeanstalk &amp; test result fetching</li>
+							<li>Production server deployment using ElasticBeanstalk &amp; CNAME swap</li>
+						</ul>
+						<li>Wrote a run script that builds a Docker image for each of the above servers from a templated Dockerfile, which is pushed to Dockerhub for ease of use and version control</li>
+						<ul>
+							<li>Built a celery notification system running on a RabbitMQ server into each Docker image</li>
+							<li>Configured MySQL, RabbitMQ, and Nginx servers and on each Docker image</li>
+							<li>Wrote several deployment hooks to run the Django wsgi on Nginx, connect it to the MySQL server, &amp; connect a Celery notifier to the RabbitMQ server</li>
+						</ul>
+						<li>Executed the migration from a local database to a remote database with a secure transfer of credentials upon deployment</li>
+						<li>Completely decoupled server logic from client applications by refactoring to a REST api written in Python, using the Django framework</li>
+						<ul>
+							<li>Created a full documentation spreadsheet outlining the I/O and application flow of a REST api that would serve the same functionality as before</li>
+							<li>
+								Implemented the decoupling of each HTTP request one REST function at a time, working with the front-end intern to ensure the client application
+								accounted for each new api route with every update
+							</li>
+							<li>Utilized the previously written staging script to test each decoupled function before being pushed to production</li>
+						</ul>
 					</ul>
-					<li>The script builds a Docker image for each of the above servers from a templated Dockerfile, which is pushed to Dockerhub for ease of use and version control</li>
-					<ul>
-						<li>Built a celery notification system running on a RabbitMQ server into each Docker image</li>
-						<li>Configured MySQL, RabbitMQ, and Nginx servers and on each Docker image</li>
-						<li>Wrote several deployment hooks to run the Django wsgi on Nginx, connect it to the MySQL server, &amp; connect a Celery notifier to the RabbitMQ server</li>
-					</ul>
-					<li>Executed the migration from a local database to a remote database with a secure transfer of credentials upon deployment</li>
-					<li>Completely decoupled server logic from client applications by refactoring to a REST api written in Python, using the Django framework</li>
-					<ul>
-						<li>Created a full documentation spreadsheet outlining the I/O and application flow of a REST api that would serve the same functionality as before</li>
-						<li>
-							Implemented the decoupling of each HTTP request one REST function at a time, working with the front-end intern to ensure the client application
-							accounted for each new api route with every update
-						</li>
-						<li>Utilized the previously written staging script to test each decoupled function before being pushed to production</li>
-					</ul>
-				</ul>
+				</div>
 			</div>
-			<div class="panel panel_two_thirds">
+
+			<div class="panel">
 				<h1>
 					Computer Science Tutor
 				</h1>
@@ -79,12 +115,14 @@
 					<a href="https://www.luc.edu/cs/people/tutors/" target="_blank">Loyola University Chicago</a><br/>
 					09/2019 - 05/2020
 				</h2>
-				<ul>
-					<li>Tutored Computer Science students at the Loyola tutoring center</li>
-					<li>Connected with each student personally in order to understand their comprehension level</li>
-				</ul>
+				<div class="text_container">
+					<ul>
+						<li>Tutored Computer Science students at the Loyola tutoring center</li>
+						<li>Connected with each student personally in order to understand their comprehension level</li>
+					</ul>
+				</div>
 			</div>
-			<div class="panel panel_two_thirds">
+			<div class="panel">
 				<h1>
 					Research Assistant
 				</h1>
@@ -92,12 +130,14 @@
 					<a href="https://www.luc.edu/cs/" target="_blank">Loyola University Chicago</a><br/>
 					07/2019 - 12/2019
 				</h2>
-				<ul>
-					<li>Analyzed videos of Chicago Public school courses, ensuring the curriculum and research standards were upheld</li>
-					<li>Met with lead researchers weekly to discuss progress and future steps</li>
-				</ul>
+				<div class="text_container">
+					<ul>
+						<li>Analyzed videos of Chicago Public school courses, ensuring the curriculum and research standards were upheld</li>
+						<li>Met with lead researchers weekly to discuss progress and future steps</li>
+					</ul>
+				</div>
 			</div>
-			<div class="panel panel_two_thirds">
+			<div class="panel">
 				<h1>
 					Java Instructor
 				</h1>
@@ -107,13 +147,15 @@
 					</a><br/>
 					06/2019 - 08/2019
 				</h2>
-				<ul>
-					<li>Taught fundamentals of the Java programming language using project-based learning</li>
-					<li>Structured a curriculum with interesting hands-on projects</li>
-					<li>Personally helped each student develop their own video game using the Processing Java library</li>
-				</ul>
+				<div class="text_container">
+					<ul>
+						<li>Taught fundamentals of the Java programming language using project-based learning</li>
+						<li>Structured a curriculum with interesting hands-on projects</li>
+						<li>Personally helped each student develop their own video game using the Processing Java library</li>
+					</ul>
+				</div>
 			</div>
-			<div class="panel panel_two_thirds">
+			<div class="panel">
 				<h1>
 					Android Research Developer
 				</h1>
@@ -121,14 +163,16 @@
 					<a href="https://www.luc.edu/" target="_blank">Loyola University Chicago</a><br/>
 					05/2019 - 06/2019
 				</h2>
-				<ul>
-					<li>Collaborated with three other software engineers in person, full-time for a month</li>
-					<li>Created customizable sign-language-based app for physically and vocally disabled people</li>
-					<li>Produced an Android system called 
-					<a href="/projects/#talkmotion">TalkMotion</a></li>
-				</ul>
+				<div class="text_container">
+					<ul>
+						<li>Collaborated with three other software engineers in person, full-time for a month</li>
+						<li>Created customizable sign-language-based app for physically and vocally disabled people</li>
+						<li>Produced an Android system called 
+						<a href="/projects/#talkmotion">TalkMotion</a></li>
+					</ul>
+				</div>
 			</div>
-			<div class="panel panel_two_thirds">
+			<div class="panel">
 				<h1>
 					Switchboard Operator
 				</h1>
@@ -136,11 +180,13 @@
 					<a href="https://www.luc.edu/" target="_blank">Loyola University Chicago</a><br/>
 					08/2018 - 05/2019
 				</h2>
-				<ul>
-					<li>Operated the main phone line for Loyola University, answering questions and transferring calls</li>
-				</ul>
+				<div class="text_container">
+					<ul>
+						<li>Operated the main phone line for Loyola University, answering questions and transferring calls</li>
+					</ul>
+				</div>
 			</div>
-			<div class="panel panel_two_thirds">
+			<div class="panel">
 				<h1>
 					Car Detailer
 				</h1>
@@ -148,9 +194,11 @@
 					<a href="https://abescustomcarcareil.com/" target="_blank">Abe's Custom Car Care</a>: Mokena, IL<br/>
 					05/2015 - 01/2017
 				</h2>
-				<ul>
-					<li>This was my first job, so this panel is just for fun, but I washed cars</li>
-				</ul>
+				<div class="text_container">
+					<ul>
+						<li>This was my first job, so this panel is just for fun, but I washed cars</li>
+					</ul>
+				</div>
 			</div>
 		</div>
 	</body>
